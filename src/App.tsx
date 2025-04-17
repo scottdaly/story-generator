@@ -45,16 +45,9 @@ function App() {
 
   return (
     <>
-      <nav className="bg-gray-800 text-white p-4">
+      <nav className="bg-[#E1E0D3] p-4">
         <ul className="flex space-x-4 items-center">
-          <li>
-            <Link to="/" className="hover:text-gray-300">Home</Link>
-          </li>
-          {user && (
-             <li>
-               <Link to="/play" className="hover:text-gray-300">Play</Link>
-             </li>
-          )}
+          <p className="text-zinc-900 font-bold text-2xl">Story Generator</p>
           <li className="flex-grow"></li> {/* Spacer */} 
           {isLoading ? (
             <li>Loading...</li>
@@ -81,9 +74,9 @@ function App() {
         </ul>
       </nav>
 
-      <hr />
+      
 
-      <div className="p-4 bg-gray-100">
+      <div className="bg-[#E1E0D3] min-h-screen">
         <Routes>
           <Route path="/" element={<Home />} />
           {/* Protect the /play and /create-character routes */}

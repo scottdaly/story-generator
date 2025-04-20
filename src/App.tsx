@@ -10,6 +10,7 @@ import {
 import Home from "./pages/Home";
 import Play from "./pages/Play";
 import CreateCharacter from "./pages/CreateCharacter";
+import MyStories from "./pages/MyStories";
 import { useAuth } from "./context/AuthContext";
 import LoginModal from "./components/LoginModal";
 
@@ -71,56 +72,68 @@ function App() {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <nav className="bg-[#E1E0D3] py-4 px-8">
         <ul className="flex space-x-4 items-center">
-          <p className="text-zinc-900 font-bold text-2xl cormorant-upright-bold">
-            EverTale
-          </p>
+          <Link to="/" className="flex items-center cursor-pointer">
+            <p className="text-zinc-900 font-bold text-2xl cormorant-upright-bold">
+              EverTale
+            </p>
+          </Link>
           <li className="flex-grow"></li>
           {isLoading ? (
             <li>Loading...</li>
           ) : user ? (
-            <li className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center space-x-2 hover:bg-zinc-600/5 rounded-lg px-3 py-1 transition-colors duration-200"
-              >
-                {user.picture && (
-                  <img
-                    src={user.picture}
-                    alt="User"
-                    className="w-6 h-6 rounded-full"
-                  />
-                )}
-                <span>{user.name}</span>
-                <svg
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    showDropdown ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <>
+              <li>
+                <Link
+                  to="/my-stories"
+                  className="text-zinc-900 hover:text-zinc-700 transition-colors duration-200"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                  <button
-                    onClick={logout}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                  My Stories
+                </Link>
+              </li>
+              <li className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="flex items-center space-x-2 hover:bg-zinc-600/5 rounded-lg px-3 py-1 transition-colors duration-200"
+                >
+                  {user.picture && (
+                    <img
+                      src={user.picture}
+                      alt="User"
+                      className="w-6 h-6 rounded-full"
+                    />
+                  )}
+                  <span>{user.name}</span>
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      showDropdown ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </li>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <button
+                      onClick={logout}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </li>
+            </>
           ) : (
             <li>
               <button
@@ -134,12 +147,13 @@ function App() {
         </ul>
       </nav>
 
-      <div className="bg-[#E1E0D3] min-h-[calc(100vh-64px)]">
+      <div className="flex flex-col h-full bg-[#E1E0D3] min-h-[calc(100vh-64px)]">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/create-character" element={<CreateCharacter />} />
             <Route path="/play" element={<Play />} />
+            <Route path="/my-stories" element={<MyStories />} />
           </Route>
         </Routes>
       </div>
@@ -151,7 +165,7 @@ function App() {
         isGoogleScriptLoaded={isGoogleScriptLoaded}
         googleClientId={googleClientId}
       />
-    </>
+    </div>
   );
 }
 

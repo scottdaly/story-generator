@@ -1,4 +1,10 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
 
 // Define the shape of the user object
 interface User {
@@ -27,7 +33,7 @@ interface AuthProviderProps {
 }
 
 // Backend API endpoint for verification
-const AUTH_VERIFY_URL = 'http://localhost:3000/auth/google/verify';
+const AUTH_VERIFY_URL = "http://localhost:3000/auth/google/verify";
 
 // Create the provider component
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -37,19 +43,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Effect to check for Google script loading
   useEffect(() => {
-    console.log('[AuthProvider] Running checkGoogleScript useEffect');
+    console.log("[AuthProvider] Running checkGoogleScript useEffect");
     let checkCount = 0;
     const maxChecks = 25; // ~5 seconds
 
     const checkGoogleScript = () => {
       checkCount++;
       if (window.google?.accounts?.id) {
-        console.log('[AuthProvider] Google script LOADED successfully.');
+        console.log("[AuthProvider] Google script LOADED successfully.");
         setIsGoogleScriptLoaded(true);
       } else if (checkCount < maxChecks) {
         setTimeout(checkGoogleScript, 200);
       } else {
-        console.error(`[AuthProvider] Google script failed to load after ${maxChecks} attempts.`);
+        console.error(
+          `[AuthProvider] Google script failed to load after ${maxChecks} attempts.`
+        );
         // Consider setting an error state if script load failure is critical
       }
     };
@@ -58,6 +66,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Effect for initial auth check (placeholder)
   useEffect(() => {
+    // Check for existing session in localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Error parsing stored user data:", error);
+        localStorage.removeItem("user");
+      }
+    }
     setIsLoading(false);
   }, []);
 
@@ -65,11 +83,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (idToken: string) => {
     setIsLoading(true);
     try {
-      console.log('Sending ID token to backend for verification...');
+      console.log("Sending ID token to backend for verification...");
       const response = await fetch(AUTH_VERIFY_URL, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ idToken }),
       });
@@ -77,16 +95,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('Backend verification failed:', data);
-        throw new Error(data.error || 'Google sign-in verification failed.');
+        console.error("Backend verification failed:", data);
+        throw new Error(data.error || "Google sign-in verification failed.");
       }
 
-      console.log('Backend verification successful:', data);
+      console.log("Backend verification successful:", data);
       setUser(data.user); // Set the user state upon successful verification
-
+      // Store user data in localStorage
+      localStorage.setItem("user", JSON.stringify(data.user));
     } catch (error) {
-      console.error('Login Error:', error);
+      console.error("Login Error:", error);
       setUser(null); // Ensure user is null if login fails
+      localStorage.removeItem("user");
       // Optionally re-throw or handle error display to the user
     } finally {
       setIsLoading(false);
@@ -95,9 +115,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Logout function
   const logout = () => {
-    console.log('Logging out...');
+    console.log("Logging out...");
     setUser(null);
-    // Potentially clear any stored tokens/session info here
+    // Clear stored session data
+    localStorage.removeItem("user");
   };
 
   // Value object passed to consumers
@@ -117,7 +138,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-}; 
+};
